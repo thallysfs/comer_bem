@@ -1,5 +1,6 @@
 import 'package:comer_bem/repositories/child_repository.dart';
 import 'package:comer_bem/repositories/register_repository.dart';
+import 'package:comer_bem/screens/consult_records_screen.dart';
 import 'package:comer_bem/screens/register_activity.dart';
 import 'package:comer_bem/screens/register_child.dart';
 import 'package:comer_bem/service/auth_service.dart';
@@ -64,6 +65,10 @@ class MyApp extends StatelessWidget {
               ),
             ),
           ),
+          appBarTheme: const AppBarTheme(
+            titleTextStyle: TextStyle(
+                fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black),
+          ),
         ),
         darkTheme: ThemeData(
           useMaterial3: true,
@@ -73,7 +78,8 @@ class MyApp extends StatelessWidget {
         routes: {
           '/home': (context) => const AuthCheck(),
           '/registerActivity': (context) => const RegisterActivity(),
-          '/regiterChild': (context) => const RegisterChild()
+          '/regiterChild': (context) => const RegisterChild(),
+          '/consultRecordsScreen': (context) => const ConsultRecordsScreen()
         },
         home: const AuthCheck());
   }

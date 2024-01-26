@@ -52,7 +52,9 @@ class MainScreen extends StatelessWidget {
                 ActivityCard(
                   name: 'Consultar Reg',
                   icon: Icons.plagiarism_outlined,
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context).pushNamed('/consultRecordsScreen');
+                  },
                 ),
                 ActivityCard(
                   name: 'Adm. paciente',
