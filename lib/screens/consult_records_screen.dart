@@ -1,7 +1,10 @@
+import 'package:comer_bem/models/register.dart';
+import 'package:comer_bem/repositories/register_repository.dart';
 import 'package:comer_bem/widgets/bar_graph/my_bar_graph.dart';
 import 'package:comer_bem/widgets/dropdown_children.dart';
 import 'package:comer_bem/widgets/record_simple_card.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ConsultRecordsScreen extends StatefulWidget {
   const ConsultRecordsScreen({super.key});
@@ -17,6 +20,8 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
   var _isLoading = false;
   // TODO alimentar com os dados dos meses
   List<double> amountMonthFood = [5, 3, 4, 8, 12, 1, 7, 6, 8, 11, 4, 2];
+  List<double> amountMonthSkill = [5, 3, 4, 8, 12, 1, 7, 6, 8, 11, 4, 2];
+  Future<List<Register>?>? registerChildList;
 
   @override
   void initState() {
@@ -43,9 +48,10 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
     });
   }
 
-  void _genereteRecord() {
+  Future<void> _genereteRecordGraph() async {
     setState(() {
       _isLoading = true;
+      registerChildList = null;
     });
 
     // Validar idChild
@@ -58,7 +64,16 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
       return;
     }
 
+    //pegar o ano atual
+    DateTime dataAtual = DateTime.now();
+    int ano = dataAtual.year;
+
+    // Obtém a instância do ChildRepository do Provider
+    RegisterRepository registerRepository = context.read<RegisterRepository>();
+    print(_selectedChild);
     setState(() {
+      registerChildList =
+          registerRepository.findOneChildrenRegister(_selectedChild!, ano);
       _isLoading = false;
     });
   }
@@ -82,6 +97,7 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
               onChildSelected: (value) {
                 setState(() {
                   _selectedChild = value;
+                  _genereteRecordGraph();
                 });
               },
             ),
@@ -111,41 +127,81 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
               ],
             ),
             const SizedBox(height: 25),
-            const Text(
-              'Alimentos',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            // colocar aqui o FutureBuilder
+            Container(
+              height: 100,
+              child: FutureBuilder<List<Register>?>(
+                key: UniqueKey(),
+                future: registerChildList, // Use the Future variable here
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    // Exibir os dados
+                    List<Register> registers = snapshot.data!;
+                    return ListView.builder(
+                      itemCount: registers.length,
+                      itemBuilder: (context, index) {
+                        return Text(registers[index]
+                            .descriptionRegister); // Example usage
+                      },
+                    );
+                  } else if (snapshot.hasError) {
+                    // Exibir uma mensagem de erro
+                    return Text(snapshot.error.toString());
+                  } else if (_isLoading) {
+                    // Exibir um indicador de carregamento
+                    return const CircularProgressIndicator();
+                  } else {
+                    return const Text(
+                        'Escolha uma criança para gerar o gráfico');
+                  }
+                },
+              ),
             ),
-            const SizedBox(
-              height: 35,
-            ),
+            // const Text(
+            //   'Alimentos',
+            //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            // ),
+            // const SizedBox(
+            //   height: 35,
+            // ),
             // Gráfico comida
-            Center(
-              child: SizedBox(
-                height: 200,
-                child: MyBarGraph(
-                  monthSummary: amountMonthFood,
-                  colorBar: Theme.of(context).colorScheme.error,
-                ),
-              ),
-            ),
-            //Gráfico habilidades
-            Divider(),
-            const SizedBox(height: 25),
-            const Text(
-              'Habilidades',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            ),
+            // Center(
+            //   child: SizedBox(
+            //     height: 200,
+            //     child: MyBarGraph(
+            //       monthSummary: amountMonthFood,
+            //       colorBar: Theme.of(context).colorScheme.error,
+            //     ),
+            //   ),
+            // ),
+            // //Gráfico habilidades
+            // Divider(),
+            // const SizedBox(height: 25),
+            // const Text(
+            //   'Habilidades',
+            //   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            // ),
+            // const SizedBox(
+            //   height: 35,
+            // ),
+            // Center(
+            //   child: SizedBox(
+            //     height: 200,
+            //     child: MyBarGraph(
+            //         monthSummary: amountMonthFood,
+            //         colorBar: Colors.green.shade100),
+            //   ),
+            // ),
             const SizedBox(
-              height: 35,
+              height: 25,
             ),
-            Center(
-              child: SizedBox(
-                height: 200,
-                child: MyBarGraph(
-                    monthSummary: amountMonthFood,
-                    colorBar: Colors.green.shade100),
-              ),
-            ),
+            ElevatedButton(
+                onPressed: () {},
+                child: Text(
+                  'Gerar PDF',
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold),
+                ))
             //TODO CardRecordWithDetails a partir do calendário
             // TODO botões
           ]),

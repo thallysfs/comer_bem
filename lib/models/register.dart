@@ -9,7 +9,7 @@ class Register {
       required this.createdAt});
 
   final String descriptionRegister;
-  final TypeRegister type;
+  final String type;
   final String idChild;
   final String createdAt;
 }

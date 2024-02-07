@@ -67,7 +67,7 @@ class _RegisterActivityState extends State<RegisterActivity> {
     final newRegister = Register(
       createdAt: DateTime.now().toString(),
       descriptionRegister: _registerController.text,
-      type: _type!,
+      type: _type!.toString(),
       idChild: _selectedChild!,
     );
 
