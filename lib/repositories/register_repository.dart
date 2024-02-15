@@ -5,7 +5,7 @@ import 'package:comer_bem/service/auth_service.dart';
 import 'package:flutter/material.dart';
 
 class RegisterRepository extends ChangeNotifier {
-  final List<Register> _registerList = [];
+  List<Register> _registerList = [];
   late FirebaseFirestore db;
   late AuthService auth;
   final String _collection = 'registers';
@@ -22,7 +22,7 @@ class RegisterRepository extends ChangeNotifier {
       String idChild, int year) async {
     //final initialDate = DateTime(year, 1, 1);
     //final finalDate = DateTime(year, 2, 28);
-
+    _registerList = [];
     if (auth.user != null) {
       final snapshot = await db
           .collection(_collection)
@@ -40,12 +40,13 @@ class RegisterRepository extends ChangeNotifier {
           idChild: data['idChild'],
           createdAt: data['createdAt'],
         );
-
         _registerList.add(register);
       }
     }
-    return _registerList;
+    notifyListeners();
   }
+
+  List<Register>? get registerValue => _registerList;
 
   Future<void> save(Register register) async {
     await db.collection(_collection).add({

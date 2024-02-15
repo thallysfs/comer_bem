@@ -80,6 +80,8 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final repository = Provider.of<RegisterRepository>(context);
+
     return Scaffold(
         appBar: AppBar(
           title: const Text('Consultar evolução alimentar'),
@@ -127,34 +129,38 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
               ],
             ),
             const SizedBox(height: 25),
-            // colocar aqui o FutureBuilder
-            Container(
-              height: 100,
-              child: FutureBuilder<List<Register>?>(
-                key: UniqueKey(),
-                future: registerChildList, // Use the Future variable here
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    // Exibir os dados
-                    List<Register> registers = snapshot.data!;
-                    return ListView.builder(
-                      itemCount: registers.length,
+            SizedBox(
+              height: 50,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  if (repository.registerValue != null) ...[
+                    const SizedBox(height: 16.0),
+                    const Text('Registros'),
+                    ListView.builder(
+                      shrinkWrap: true,
+                      itemCount: repository.registerValue!.length,
                       itemBuilder: (context, index) {
-                        return Text(registers[index]
-                            .descriptionRegister); // Example usage
+                        final register = repository.registerValue![index];
+                        return ListTile(
+                          title: Text(register.descriptionRegister),
+                        );
                       },
-                    );
-                  } else if (snapshot.hasError) {
-                    // Exibir uma mensagem de erro
-                    return Text(snapshot.error.toString());
-                  } else if (_isLoading) {
-                    // Exibir um indicador de carregamento
-                    return const CircularProgressIndicator();
-                  } else {
-                    return const Text(
-                        'Escolha uma criança para gerar o gráfico');
-                  }
-                },
+                    ),
+                    const SizedBox(
+                      height: 25,
+                    ),
+                    ElevatedButton(
+                        onPressed: () {},
+                        child: const Text(
+                          'Gerar PDF',
+                          style: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ))
+                    //TODO CardRecordWithDetails a partir do calendário
+                    // TODO botões
+                  ],
+                ],
               ),
             ),
             // const Text(
@@ -192,18 +198,6 @@ class _ConsultRecordsScreenState extends State<ConsultRecordsScreen> {
             //         colorBar: Colors.green.shade100),
             //   ),
             // ),
-            const SizedBox(
-              height: 25,
-            ),
-            ElevatedButton(
-                onPressed: () {},
-                child: Text(
-                  'Gerar PDF',
-                  style: TextStyle(
-                      color: Colors.white, fontWeight: FontWeight.bold),
-                ))
-            //TODO CardRecordWithDetails a partir do calendário
-            // TODO botões
           ]),
         ));
   }
